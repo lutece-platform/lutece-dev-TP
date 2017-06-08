@@ -45,6 +45,8 @@ import javax.ws.rs.core.MediaType;
 
 import fr.paris.lutece.plugins.example.business.Project;
 import fr.paris.lutece.plugins.example.business.ProjectHome;
+import fr.paris.lutece.plugins.extend.modules.hit.business.Hit;
+import fr.paris.lutece.plugins.extend.modules.hit.service.HitService;
 import fr.paris.lutece.plugins.rest.service.RestConstants;
 import fr.paris.lutece.portal.service.spring.SpringContextService;
 import fr.paris.lutece.plugins.rest.util.json.JSONUtil;
@@ -69,6 +71,35 @@ public class ProjectRest {
         json.put( "name", project.getName( ) );
         json.put( "description", project.getDescription( ) );
         json.put( "cost", project.getCost( ) );
+
+        return json;
+    }
+
+    /**
+     * Build Json with stats 
+     * 
+     * @param project
+     * @return 
+     */
+    private ObjectNode buildJSONwithStats(Project project) {
+        ObjectMapper mapper = new ObjectMapper();
+        ObjectNode json = mapper.createObjectNode();
+        
+        // get the HitService in the spring context
+        HitService hs = SpringContextService.getBean(HitService.BEAN_SERVICE);
+
+        String strIdExtendableResource = String.valueOf(project.getId()); // extend resource ID
+        String strExtendableResourceType = Project.PROPERTY_RESOURCE_TYPE; // extend resource type
+
+        Hit hit;
+        // search nb of hits
+        hit = hs.findByParameters(strIdExtendableResource, strExtendableResourceType);
+
+        json.put("id", project.getId());
+        json.put("name", project.getName());
+        if (hit != null) {
+            json.put("hitNb", hit.getNbHits());
+        }
 
         return json;
     }
@@ -128,5 +159,32 @@ public class ProjectRest {
 
         return strJSON;
     }
+
+    /**
+     * get project stats
+     * 
+     * @param nId
+     * @return the json file of the project stats
+     * @throws SiteMessageException 
+     */
+    @GET
+    @Path("/projects_stats/{id}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public String getProjectStatsById(@PathParam("id") int nId) throws SiteMessageException {
+
+        String strJSON = "";
+        try {
+            Project project = ProjectHome.findByPrimaryKey(nId);
+            strJSON = this.buildJSONwithStats(project).toPrettyString( );
+        } catch (NumberFormatException e) {
+            strJSON = JSONUtil.formatError("Invalid project number", 3);
+        } catch (Exception e) {
+            strJSON = JSONUtil.formatError("project not found", 1);
+        }
+
+        return strJSON;
+
+    }
+
 
 }

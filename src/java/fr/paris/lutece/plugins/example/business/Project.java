@@ -33,20 +33,26 @@
  */
 package fr.paris.lutece.plugins.example.business;
 
+import fr.paris.lutece.portal.service.i18n.Localizable;
+import fr.paris.lutece.portal.service.resource.IExtendableResource;
 import javax.validation.constraints.*;
 import org.hibernate.validator.constraints.*;
-import java.io.Serializable;
+import java.util.Locale;
 
 /**
  * This is the business class for the object Project
- */
-public class Project implements Serializable
-{
+ */ 
+public class Project implements Localizable, IExtendableResource {
+
+    
     private static final long serialVersionUID = 1L;
-
-    // Variables declarations
+    
+    public static final String PROPERTY_RESOURCE_TYPE = "Project_resource_type";  
+    
+    // Variables declarations 
     private int _nId;
-
+    private Locale _locale;
+    
     @NotEmpty( message = "#i18n{example.validation.project.Name.notEmpty}" )
     @Size( max = 50, message = "#i18n{example.validation.project.Name.size}" )
     private String _strName;
@@ -166,7 +172,7 @@ public class Project implements Serializable
         return _nCost;
     }
     
-    
+
     /**
      * Cost control : 
      * 
@@ -177,5 +183,44 @@ public class Project implements Serializable
         return ( _nCost % 5 == 0  );
     }
     
+
+    @Override
+    public void setLocale(Locale arg0) {
+        this._locale = arg0;
+    }
     
+        /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String getIdExtendableResource() {
+        return Integer.toString(_nId);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String getExtendableResourceType() {
+        return PROPERTY_RESOURCE_TYPE;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String getExtendableResourceName() {
+        return _strName;
+    }
+
+    @Override
+    public String getExtendableResourceDescription() {
+        return _strDescription;
+    }
+
+    @Override
+    public String getExtendableResourceImageUrl() {
+        return _strImageUrl;
+    }
+
 }
