@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2002-2017, Mairie de Paris
+ * Copyright (c) 2002-2019, Mairie de Paris
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -52,14 +52,15 @@ import fr.paris.lutece.portal.service.spring.SpringContextService;
 import fr.paris.lutece.plugins.rest.util.json.JSONUtil;
 import fr.paris.lutece.portal.service.message.SiteMessageException;
 
-@Path(RestConstants.BASE_PATH + "example")
-public class ProjectRest {
+@Path( RestConstants.BASE_PATH + "example" )
+public class ProjectRest
+{
 
     /**
      * build JSON
      * 
      * @param project
-     * @return 
+     * @return
      */
     private ObjectNode buildJSON( Project project )
     {
@@ -76,24 +77,24 @@ public class ProjectRest {
     }
 
     /**
-     * Build Json with stats 
+     * Build Json with stats
      * 
      * @param project
-     * @return 
+     * @return
      */
     private ObjectNode buildJSONwithStats(Project project) {
         ObjectMapper mapper = new ObjectMapper();
         ObjectNode json = mapper.createObjectNode();
         
         // get the HitService in the spring context
-        HitService hs = SpringContextService.getBean(HitService.BEAN_SERVICE);
+        HitService hs = SpringContextService.getBean( HitService.BEAN_SERVICE );
 
-        String strIdExtendableResource = String.valueOf(project.getId()); // extend resource ID
+        String strIdExtendableResource = String.valueOf( project.getId( ) ); // extend resource ID
         String strExtendableResourceType = Project.PROPERTY_RESOURCE_TYPE; // extend resource type
 
         Hit hit;
         // search nb of hits
-        hit = hs.findByParameters(strIdExtendableResource, strExtendableResourceType);
+        hit = hs.findByParameters( strIdExtendableResource, strExtendableResourceType );
 
         json.put("id", project.getId());
         json.put("name", project.getName());
@@ -110,11 +111,12 @@ public class ProjectRest {
      * @return the json file of the project list
      */
     @GET
-    @Path("/projects")
-    @Produces(MediaType.APPLICATION_JSON)
-    public String getProjectList() {
+    @Path( "/projects" )
+    @Produces( MediaType.APPLICATION_JSON )
+    public String getProjectList( )
+    {
 
-        Collection<Project> ListeProject = ProjectHome.getProjectsList();
+        Collection<Project> ListeProject = ProjectHome.getProjectsList( );
 
         ObjectMapper mapper = new ObjectMapper();
         ObjectNode json = mapper.createObjectNode();
@@ -131,16 +133,17 @@ public class ProjectRest {
     }
 
     /**
-     * get a project 
+     * get a project
      * 
      * @param nId
      * @return the json file of the project l
-     * @throws SiteMessageException 
+     * @throws SiteMessageException
      */
     @GET
-    @Path("/projects/{id}")
-    @Produces(MediaType.APPLICATION_JSON)
-    public String getProjectById(@PathParam("id") int nId) throws SiteMessageException {
+    @Path( "/projects/{id}" )
+    @Produces( MediaType.APPLICATION_JSON )
+    public String getProjectById( @PathParam( "id" ) int nId ) throws SiteMessageException
+    {
 
         String strJSON = "";
         try
@@ -165,26 +168,31 @@ public class ProjectRest {
      * 
      * @param nId
      * @return the json file of the project stats
-     * @throws SiteMessageException 
+     * @throws SiteMessageException
      */
     @GET
-    @Path("/projects_stats/{id}")
-    @Produces(MediaType.APPLICATION_JSON)
-    public String getProjectStatsById(@PathParam("id") int nId) throws SiteMessageException {
+    @Path( "/projects_stats/{id}" )
+    @Produces( MediaType.APPLICATION_JSON )
+    public String getProjectStatsById( @PathParam( "id" ) int nId ) throws SiteMessageException
+    {
 
         String strJSON = "";
-        try {
+        try 
+	{
             Project project = ProjectHome.findByPrimaryKey(nId);
             strJSON = this.buildJSONwithStats(project).toPrettyString( );
-        } catch (NumberFormatException e) {
+        } 
+	catch (NumberFormatException e) 
+	{
             strJSON = JSONUtil.formatError("Invalid project number", 3);
-        } catch (Exception e) {
+        } 
+	catch (Exception e) 
+	{
             strJSON = JSONUtil.formatError("project not found", 1);
         }
 
         return strJSON;
 
     }
-
 
 }
